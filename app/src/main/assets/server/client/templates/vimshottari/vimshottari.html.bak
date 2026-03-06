@@ -1,0 +1,609 @@
+{% extends "VIMSHOTTARI/base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cosmic-theme.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>🔮 COSMIC DASHA</h1>
+    <p>Vimshottari Planetary Timeline</p>
+</div>
+
+{% include "VIMSHOTTARI/includes/form_section.html" %}
+
+{% if error %}
+<div class="error-message glass-card fade-in">
+    <span>⚠️</span> {{ error }}
+</div>
+{% endif %}
+
+{% if result %}
+<div class="result fade-in" id="result-section">
+    
+    <!-- 1. Dasha Analysis Only -->
+    <div class="dropdown-container">
+        <div class="dropdown-header" onclick="toggleSection('dasha-analysis')">
+            <div class="dropdown-title">
+                <span class="dropdown-icon">ॐ</span>
+                <span>Dasha Analysis</span>
+            </div>
+            <span class="dropdown-arrow collapsed" id="arrow-dasha-analysis">▼</span>
+        </div>
+        <div class="dropdown-content collapsed" id="dasha-analysis">
+            <div class="combined-dasha">
+                <div class="glass-card dasha-card">
+                    <div class="dasha-header">
+                        <div class="dasha-title">🕉️ DASHA AT BIRTH</div>
+                        <div class="dasha-subtitle">{{ result.birth_time }}</div>
+                    </div>
+                    <div class="dasha-list">
+                        <div class="dasha-item"><span class="dasha-label">Mahadasha</span><span class="dasha-value">{{ result.birth_md }}</span></div>
+                        <div class="dasha-item"><span class="dasha-label">Antardasha</span><span class="dasha-value">{{ result.birth_ad }}</span></div>
+                        <div class="dasha-item"><span class="dasha-label">Pratyantar</span><span class="dasha-value">{{ result.birth_pd }}</span></div>
+                        <div class="dasha-item"><span class="dasha-label">Sookshma</span><span class="dasha-value">{{ result.birth_sd }}</span></div>
+                        <div class="dasha-item"><span class="dasha-label">Prana</span><span class="dasha-value prana">{{ result.birth_pr }}</span></div>
+                    </div>
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-subtle); text-align: center; color: rgba(255,255,255,0.4); font-size: 0.8rem;">MD Started: {{ result.md_start_date }}</div>
+                </div>
+                
+                {% if result.day_details %}
+                <div class="glass-card day-view-card">
+                    <h3 class="section-title">Target Date: {{ result.target_date }}</h3>
+                    <div class="dasha-note">ℹ️ These dasha systems display end dates and times</div>
+                    <div class="day-summary">
+                        <div class="day-summary-item"><div class="day-summary-label">Mahadasha</div><div class="day-summary-value">{{ result.day_details.md_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.md_end }}</div></div>
+                        <div class="day-summary-item"><div class="day-summary-label">Antardasha</div><div class="day-summary-value">{{ result.day_details.ad_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.ad_end }}</div></div>
+                        <div class="day-summary-item"><div class="day-summary-label">Pratyantar</div><div class="day-summary-value">{{ result.day_details.pd_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.pd_end }}</div></div>
+                        <div class="day-summary-item"><div class="day-summary-label">Sookshma</div><div class="day-summary-value">{{ result.day_details.sd_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.sd_end }}</div></div>
+                    </div>
+                    <div class="table-container" style="padding: 0; background: transparent; border: none;">
+                        <table class="data-table">
+                            <thead><tr><th>MD</th><th>AD</th><th>PD</th><th>SD</th><th>PR</th><th>End Date & Time</th></tr></thead>
+                            <tbody>
+                                {% for period in result.day_details.periods %}
+                                <tr>
+                                    <td><strong>{{ period.md }}</strong></td>
+                                    <td>{{ period.ad }}</td>
+                                    <td>{{ period.pd }}</td>
+                                    <td>{{ period.sd }}</td>
+                                    <td style="color: var(--accent-purple); font-weight: bold;">{{ period.pr }}</td>
+                                    <td style="font-family: 'Orbitron', monospace; color: var(--accent-cyan); font-size: 0.9rem;">{{ period.end_date }} {{ period.end_time }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="download-btn-container">
+                        <button type="button" class="btn-gold" onclick="openDownloadModal()"><span>📥</span> Download PDF Report</button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Natal Positions with Sidereal Time -->
+    {% if result.all_planets %}
+    <div class="dropdown-container">
+        <div class="dropdown-header" onclick="toggleSection('natal-pos')">
+            <div class="dropdown-title">
+                <span class="dropdown-icon">✨</span>
+                <span>Natal Positions</span>
+            </div>
+            <span class="dropdown-arrow collapsed" id="arrow-natal-pos">▼</span>
+        </div>
+        <div class="dropdown-content collapsed" id="natal-pos">
+            <div class="glass-card table-container" style="border-color: rgba(255, 215, 0, 0.1);">
+                <div class="table-header">
+                    <h3 class="table-title" style="color: var(--accent-gold);">
+                        <span>🌟</span>
+                        <span>Natal Positions</span>
+                    </h3>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <span style="color: var(--accent-cyan); font-family: 'Orbitron', monospace; font-size: 0.9rem;">Sidereal: {{ result.moon_sid }}°</span>
+                        <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ result.birth_time }}</span>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Planet</th>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Longitude</th>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Sign</th>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Degrees</th>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Nakshatra</th>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Motion</th>
+                            <th style="background: rgba(255, 215, 0, 0.1); color: var(--accent-gold);">Lord</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for planet_name, planet_data in result.all_planets.items() %}
+                        <tr>
+                            <td>
+                                <div class="planet-cell">
+                                    <span class="planet-icon">{{ planet_data.icon }}</span>
+                                    <span style="color: {{ planet_data.color }}">{{ planet_name }}</span>
+                                </div>
+                            </td>
+                            <td class="coordinates">{{ planet_data.longitude }}°</td>
+                            <td>{{ planet_data.sign_name }}</td>
+                            <td style="font-family: 'Orbitron', monospace; color: var(--accent-cyan);">{{ planet_data.dms }}</td>
+                            <td style="color: #ffa500;">{{ planet_data.nakshatra_name }} ({{ planet_data.pada }})</td>
+                            <td>
+                                {% if planet_name == 'Ascendant' %}
+                                <span style="color: #00ff88; font-weight: 600;">Rising</span>
+                                {% elif planet_data.is_retro %}
+                                <span class="retro-badge">⚠ RETRO</span>
+                                {% else %}
+                                <span style="color: #00ff88; font-weight: 600;">Direct</span>
+                                {% endif %}
+                            </td>
+                            <td style="color: var(--text-secondary); font-size: 0.9em;">{{ planet_data.lord }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% include "VIMSHOTTARI/includes/target_positions.html" %}
+    {% include "VIMSHOTTARI/includes/meteorology_chakras.html" %}
+    {% include "VIMSHOTTARI/includes/live_coordinates.html" %}
+</div>
+{% endif %}
+
+<!-- DOWNLOAD MODAL - 12 CYCLES KE SATH -->
+<div id="downloadModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeDownloadModal()">&times;</span>
+        <h2 class="modal-title">📥 Download Report</h2>
+        <p class="modal-subtitle">Complete Vimshottari Dasha Cycle</p>
+        
+        <div class="download-list">
+            <!-- Current Cycle (0) -->
+            <form method="post" action="{{ url_for('download_full_cycle_pdf') }}">
+                <input type="hidden" name="dob" value="{{ form_data.dob }}">
+                <input type="hidden" name="tob" value="{{ form_data.tob }}">
+                <input type="hidden" name="lat" value="{{ form_data.lat }}">
+                <input type="hidden" name="lon" value="{{ form_data.lon }}">
+                <input type="hidden" name="tz" value="{{ form_data.tz }}">
+                <input type="hidden" name="target" value="{{ form_data.target }}">
+                <input type="hidden" name="cycle_offset" value="0">
+                <button type="submit" class="download-btn primary">
+                    <span>⬇</span> Current Cycle (120 Years)
+                </button>
+            </form>
+            
+            <!-- Next 12 Cycles -->
+            {% if result and result.next_cycles %}
+                {% for cycle in result.next_cycles %}
+                <form method="post" action="{{ url_for('download_full_cycle_pdf') }}">
+                    <input type="hidden" name="dob" value="{{ form_data.dob }}">
+                    <input type="hidden" name="tob" value="{{ form_data.tob }}">
+                    <input type="hidden" name="lat" value="{{ form_data.lat }}">
+                    <input type="hidden" name="lon" value="{{ form_data.lon }}">
+                    <input type="hidden" name="tz" value="{{ form_data.tz }}">
+                    <input type="hidden" name="target" value="{{ form_data.target }}">
+                    <input type="hidden" name="cycle_offset" value="{{ loop.index }}">
+                    <button type="submit" class="download-btn">
+                        <span>🔄</span> Cycle {{ loop.index }}: {{ cycle.start }} - {{ cycle.end }}
+                    </button>
+                </form>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/gps-location.js') }}"></script>
+<script src="{{ url_for('static', filename='js/live-tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chakra-renderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ui-controller.js') }}"></script>
+
+<script>
+function showLoading() {
+    const btn = document.getElementById('submit-btn');
+    btn.innerHTML = '<span style="display: inline-block; animation: pulse 1s infinite;">🌌</span> CALCULATING...';
+    btn.disabled = true;
+}
+
+function toggleSection(id) {
+    const content = document.getElementById(id);
+    const arrow = document.getElementById('arrow-' + id);
+    if (content.classList.contains('collapsed')) {
+        content.classList.remove('collapsed');
+        if (arrow) arrow.classList.remove('collapsed');
+        if (id === 'live-coords' && typeof fetchLiveData === 'function') setTimeout(fetchLiveData, 300);
+        if (id === 'target-pos' && typeof updateTargetPlanetaryTable === 'function') setTimeout(updateTargetPlanetaryTable, 300);
+        if (id === 'meteorology-chakras' && typeof switchChakraData === 'function') setTimeout(() => switchChakraData('target'), 300);
+    } else {
+        content.classList.add('collapsed');
+        if (arrow) arrow.classList.add('collapsed');
+    }
+}
+
+function openDownloadModal() { 
+    const modal = document.getElementById('downloadModal');
+    if (modal) modal.style.display = 'block'; 
+}
+
+function closeDownloadModal() { 
+    const modal = document.getElementById('downloadModal');
+    if (modal) modal.style.display = 'none'; 
+}
+
+window.onclick = function(event) { 
+    const modal = document.getElementById('downloadModal');
+    if (event.target == modal) {
+        modal.style.display = 'none'; 
+    }
+}
+
+{% if result %}
+let liveUpdateInterval;
+let currentLat = {{ result.birth_lat }};
+let currentLon = {{ result.birth_lon }};
+let currentTz = {{ result.birth_tz }};
+let targetDateGlobal = "{{ result.target_date }}";
+
+const planetConfig = {
+    'Ascendant': { color: '#FFD700', icon: 'ASC' },
+    'Sun': { color: '#FFD700', size: 20, orbit: 0, icon: '☉' },
+    'Moon': { color: '#C0C0C0', size: 12, orbit: 60, icon: '☽' },
+    'Mercury': { color: '#FFA500', size: 8, orbit: 90, icon: '☿' },
+    'Venus': { color: '#FF69B4', size: 12, orbit: 120, icon: '♀' },
+    'Mars': { color: '#FF4500', size: 10, orbit: 160, icon: '♂' },
+    'Jupiter': { color: '#DAA520', size: 18, orbit: 220, icon: '♃' },
+    'Saturn': { color: '#F4A460', size: 16, orbit: 280, icon: '♄' },
+    'Rahu': { color: '#9932CC', size: 9, orbit: 320, icon: '☊' },
+    'Ketu': { color: '#708090', size: 9, orbit: 320, icon: '☋' }
+};
+
+function fetchLiveData() {
+    const tbody = document.getElementById('liveTableBody');
+    const dateEl = document.getElementById('liveDateTime');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--accent-cyan);">Loading...</td></tr>';
+    
+    fetch(`/api/live-planets?lat=${currentLat}&lon=${currentLon}&tz=${currentTz || 5.5}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                updateLiveTable(data.planets, data.timestamp);
+                document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
+            }
+        })
+        .catch(err => {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ff4d7d;padding:20px;">Error loading data</td></tr>';
+        });
+}
+
+function updateLiveTable(planets, timestamp) {
+    const tbody = document.getElementById('liveTableBody');
+    const dateEl = document.getElementById('liveDateTime');
+    if (dateEl) dateEl.textContent = timestamp || '';
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    const planetOrder = ['Ascendant', 'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+    
+    planetOrder.forEach(name => {
+        const data = planets[name];
+        if (!data) return;
+        
+        const config = planetConfig[name];
+        let motionHtml = '';
+        if (name === 'Ascendant') {
+            motionHtml = '<span style="color: #00ff88; font-weight: 600;">Rising</span>';
+        } else {
+            motionHtml = data.is_retro ? '<span class="retro-badge">⚠ RETRO</span>' : '<span style="color: #00ff88;">Direct</span>';
+        }
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="planet-cell">
+                    <span class="planet-icon" style="color: ${config.color}">${config.icon}</span>
+                    <span style="color: ${config.color}">${name}</span>
+                </div>
+            </td>
+            <td class="coordinates">${data.longitude ? data.longitude.toFixed(4) : '--'}°</td>
+            <td>${data.sign_name || '--'}</td>
+            <td style="font-family: 'Orbitron', monospace; color: var(--accent-cyan);">${data.dms || '--'}</td>
+            <td style="color: #ffa500;">${data.nakshatra_name || '--'} (${data.pada || '--'})</td>
+            <td>${motionHtml}</td>
+            <td style="color: rgba(255,255,255,0.4); font-size: 0.85rem;">${name === 'Ascendant' ? '--' : (data.speed ? data.speed.toFixed(4) : '--')}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function updateTargetPlanetaryTable() {
+    const timeVal = document.getElementById('targetTableTime')?.value || '12:00';
+    const timeFormatted = timeVal.length === 5 ? timeVal + ':00' : timeVal;
+    const targetDate = document.getElementById('inputTarget')?.value || targetDateGlobal;
+    const lat = document.getElementById('inputLat')?.value || 28.6139;
+    const lon = document.getElementById('inputLon')?.value || 77.2090;
+    const tz = document.getElementById('inputTz')?.value || 5.5;
+    
+    if (!targetDate) return;
+    const tbody = document.getElementById('targetPlanetaryBody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: var(--accent-cyan);">🌌 Calculating...</td></tr>';
+    
+    fetch('/calculate-chakras', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            time_type: 'target', 
+            date: targetDate, 
+            time: timeFormatted, 
+            lat: parseFloat(lat), 
+            lon: parseFloat(lon), 
+            tz: parseFloat(tz) 
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success && data.planets) {
+            renderTargetPlanetaryTable(data.planets);
+        }
+    })
+    .catch(err => {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;color:#ff4d7d;">⚠ Error</td></tr>`;
+    });
+}
+
+function renderTargetPlanetaryTable(planets) {
+    const tbody = document.getElementById('targetPlanetaryBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    const planetOrder = ['Ascendant', 'Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+    
+    planetOrder.forEach(name => {
+        const p = planets[name];
+        if (!p) return;
+        
+        const config = planetConfig[name];
+        let motionHtml = '';
+        if (name === 'Ascendant') {
+            motionHtml = '<span style="color: #00ff88; font-weight: 600;">Rising</span>';
+        } else {
+            motionHtml = p.is_retro ? '<span class="retro-badge">⚠ RETRO</span>' : '<span style="color: #00ff88; font-weight: 600;">Direct</span>';
+        }
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="planet-cell">
+                    <span class="planet-icon" style="color: ${config.color}">${config.icon}</span>
+                    <span style="color: ${config.color}">${name}</span>
+                </div>
+            </td>
+            <td class="coordinates">${p.longitude}°</td>
+            <td>${p.sign_name}</td>
+            <td style="font-family: 'Orbitron', monospace; color: var(--accent-cyan);">${p.dms}</td>
+            <td style="color: #ffa500;">${p.nakshatra_name} (${p.pada})</td>
+            <td>${motionHtml}</td>
+            <td style="color: var(--text-secondary); font-size: 0.9em;">${p.lord || 'N/A'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Chakra Functions
+let chakraLiveInterval = null;
+let currentChakraMode = 'target';
+
+const nadiHeaders = [
+    { name: "Parchand", lord: "Saturn", nature: "Fierce", color: "#ff4d4d" },
+    { name: "Pawan", lord: "Sun", nature: "Windy", color: "#ffd700" },
+    { name: "Dahan", lord: "Mars", nature: "Hot", color: "#ff6347" },
+    { name: "Soumya", lord: "Jupiter", nature: "Weather", color: "#9acd32" },
+    { name: "Neera", lord: "Venus", nature: "Good Rain", color: "#00ced1" },
+    { name: "Jala", lord: "Mercury", nature: "Better Rain", color: "#1e90ff" },
+    { name: "Amrit", lord: "Moon", nature: "Best Rain", color: "#9932cc" }
+];
+
+function initChakras() { 
+    const container = document.getElementById('nadiHeaders');
+    if (!container) return;
+    container.innerHTML = nadiHeaders.map((h, i) => 
+        `<div class="nadi-header" style="--header-color: ${h.color}">
+            <h3>${h.name}</h3>
+            <div class="nadi-lord">♄ ${h.lord}</div>
+            <div class="nadi-nature">${h.nature}</div>
+        </div>`
+    ).join('');
+}
+
+function switchChakraData(type) {
+    document.querySelectorAll('.time-selector .time-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-chakra-${type}`).classList.add('active');
+    currentChakraMode = type;
+    
+    const timeControl = document.getElementById('targetTimeControl');
+    if (timeControl) timeControl.style.display = type === 'target' ? 'flex' : 'none';
+    
+    const statusBar = document.getElementById('chakraStatus');
+    if (statusBar) statusBar.style.display = 'block';
+    
+    document.getElementById('chakraCurrentMode').textContent = type.toUpperCase();
+    
+    const lat = document.getElementById('inputLat')?.value || 28.6139;
+    const lon = document.getElementById('inputLon')?.value || 77.2090;
+    const tz = document.getElementById('inputTz')?.value || 5.5;
+    
+    if (type === 'live') {
+        fetchChakraData('live', { lat, lon, tz });
+        if (chakraLiveInterval) clearInterval(chakraLiveInterval);
+        chakraLiveInterval = setInterval(() => fetchChakraData('live', { lat, lon, tz }), 60000);
+    } else if (type === 'target') {
+        const targetDate = document.getElementById('inputTarget')?.value || targetDateGlobal;
+        const timeVal = document.getElementById('chakraTargetTime')?.value || '12:00';
+        document.getElementById('chakraCurrentTime').textContent = timeVal;
+        fetchChakraData('target', { date: targetDate, time: timeVal + ':00', lat, lon, tz });
+    } else {
+        const dob = document.querySelector('input[name="dob"]')?.value;
+        const tob = document.querySelector('input[name="tob"]')?.value || '00:00:00';
+        fetchChakraData('birth', { date: dob, time: tob, lat, lon, tz });
+    }
+}
+
+async function fetchChakraData(timeType, params) {
+    try {
+        const response = await fetch('/calculate-chakras', {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ ...params, time_type: timeType })
+        });
+        const data = await response.json();
+        if (data.success) {
+            updateChakraUI(data);
+            document.getElementById('chakraPlanetCount').textContent = Object.keys(data.planets || {}).length;
+        }
+    } catch (error) { console.error('Chakra fetch error:', error); }
+}
+
+function updateChakraUI(data) {
+    renderSaptNadi(data.sapt_nadi);
+    renderMandal(data.mandal);
+    renderDuar(data.duar);
+}
+
+function renderSaptNadi(saptColumns) {
+    const container = document.getElementById('nadiColumns');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!saptColumns) return;
+    
+    for (let nadiIdx = 0; nadiIdx < 7; nadiIdx++) {
+        const column = document.createElement('div');
+        column.className = 'nadi-column';
+        const planetsInNadi = saptColumns[nadiIdx] || [];
+        
+        if (planetsInNadi.length === 0) {
+            column.innerHTML = '<div style="flex: 1; display: flex; align-items: center; justify-content: center; opacity: 0.2; font-size: 0.8rem;">No Planets</div>';
+        } else {
+            const nakGroups = {};
+            planetsInNadi.forEach(p => { 
+                if (!nakGroups[p.nakshatra]) nakGroups[p.nakshatra] = []; 
+                nakGroups[p.nakshatra].push(p); 
+            });
+            
+            Object.entries(nakGroups).forEach(([nakName, nakPlanets]) => {
+                const box = document.createElement('div');
+                box.className = 'nakshatra-box';
+                let planetsHtml = nakPlanets.map(p => {
+                    let classes = `planet planet-${p.name.toLowerCase()}`;
+                    if (p.is_glowing) classes += ' glow';
+                    if (p.is_critical) classes += ' critical';
+                    if (p.is_jumping) classes += ' jump';
+                    return `<div class="${classes}" title="${p.name} - ${p.nakshatra}">${p.icon}<span class="pada-badge">${p.pada}</span></div>`;
+                }).join('');
+                box.innerHTML = `<div class="nakshatra-name">${nakName}</div><div class="planets-wrapper">${planetsHtml}</div>`;
+                column.appendChild(box);
+            });
+        }
+        container.appendChild(column);
+    }
+}
+
+function renderMandal(mandalData) {
+    const container = document.getElementById('mandalContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    const colors = { 'Agni': '#ff4d4d', 'Vayu': '#87ceeb', 'Varuna': '#1e90ff', 'Mahendra': '#ffd700' };
+    
+    for (const [mandalName, items] of Object.entries(mandalData)) {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.style.setProperty('--category-color', colors[mandalName] || '#00f3ff');
+        card.innerHTML = `
+            <div class="category-header">
+                <span class="category-name">${mandalName}</span>
+                <span class="category-count">${items.length} Planets</span>
+            </div>
+            <div class="nakshatra-list">
+                ${items.map(item => {
+                    const p = item.planet;
+                    let classes = `planet planet-${p.name.toLowerCase()}`;
+                    if (p.is_glowing) classes += ' glow';
+                    return `<div class="nakshatra-item">
+                        <span class="nakshatra-info">${item.nakshatra}</span>
+                        <div class="${classes}" style="width: 28px; height: 28px;">${p.icon}<span class="pada-badge">${p.pada}</span></div>
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+        container.appendChild(card);
+    }
+}
+
+// Around line 375-380 in vimshottari.html, change:
+// renderDuar(data.duar);  →  renderDuar(data.duar);
+
+// Replace the entire renderduar function with this:
+
+// ✅ Fixed: renderDuar (not renderDaur)
+function renderDuar(duarData) {
+    const container = document.getElementById('duarContainer');  // ✅ Fixed ID
+    if (!container) return;
+    container.innerHTML = '';
+    
+    // ✅ Fixed: duarName, duarData (not daurName, daurData)
+    for (const [duarName, data] of Object.entries(duarData)) {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.style.setProperty('--category-color', data.color || '#00f3ff');
+        card.innerHTML = `
+            <div class="category-header">
+                <span class="category-name">${duarName}</span>
+                <span class="category-count">${data.items.length} Planets</span>
+            </div>
+            <div class="nakshatra-list">
+                ${data.items.length > 0 ? data.items.map(item => {
+                    const p = item.planet;
+                    let classes = `planet planet-${p.name.toLowerCase()}`;
+                    if (p.is_glowing) classes += ' glow';
+                    if (p.is_critical) classes += ' critical';
+                    if (p.is_jumping) classes += ' jump';
+                    return `<div class="nakshatra-item">
+                        <span class="nakshatra-info">${item.nakshatra}</span>
+                        <div class="${classes}" style="width: 28px; height: 28px;" 
+                             data-name="${p.name}" data-nakshatra="${p.nakshatra}" 
+                             data-pada="${p.pada}" data-status="${p.is_retro ? 'Retro' : 'Direct'}">
+                            ${p.icon}<span class="pada-badge">${p.pada}</span>
+                        </div>
+                    </div>`;
+                }).join('') : '<div class="empty-state">No planets in Duar classification</div>'}
+            </div>
+        `;
+        container.appendChild(card);
+    }
+}
+
+// ✅ Fixed: updateChakraUI function mein bhi change
+function updateChakraUI(data) {
+    renderSaptNadi(data.sapt_nadi);
+    renderMandal(data.mandal);
+    renderDuar(data.duar);  // ✅ Fixed: data.duar (not data.daur)
+}
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initChakras();
+    updateTargetPlanetaryTable();
+});
+{% endif %}
+</script>
+{% endblock %}
