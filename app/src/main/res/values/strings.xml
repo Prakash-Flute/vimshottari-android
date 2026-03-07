@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vimshottari Dasha</string>
+    <string name="loading_title">Initializing System</string>
+    <string name="loading_message">Starting Python runtime and loading astronomical calculations...</string>
+    <string name="error_title">Error</string>
+    <string name="error_message">Failed to initialize the application. Please try again.</string>
+    <string name="retry_button">Retry</string>
+    <string name="exit_button">Exit</string>
+</resources>

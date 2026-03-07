@@ -1,0 +1,60 @@
+<div class="dropdown-container">
+    <div class="dropdown-header" onclick="toggleSection('dasha-analysis')">
+        <div class="dropdown-title">
+            <span class="dropdown-icon">ॐ</span>
+            <span>Dasha Analysis</span>
+        </div>
+        <span class="dropdown-arrow collapsed" id="arrow-dasha-analysis">▼</span>
+    </div>
+    <div class="dropdown-content collapsed" id="dasha-analysis">
+        <div class="combined-dasha">
+            <div class="glass-card dasha-card">
+                <div class="dasha-header">
+                    <div class="dasha-title">🕉️ DASHA AT BIRTH</div>
+                    <div class="dasha-subtitle">{{ result.birth_time }}</div>
+                </div>
+                <div class="dasha-list">
+                    <div class="dasha-item"><span class="dasha-label">Mahadasha</span><span class="dasha-value">{{ result.birth_md }}</span></div>
+                    <div class="dasha-item"><span class="dasha-label">Antardasha</span><span class="dasha-value">{{ result.birth_ad }}</span></div>
+                    <div class="dasha-item"><span class="dasha-label">Pratyantar</span><span class="dasha-value">{{ result.birth_pd }}</span></div>
+                    <div class="dasha-item"><span class="dasha-label">Sookshma</span><span class="dasha-value">{{ result.birth_sd }}</span></div>
+                    <div class="dasha-item"><span class="dasha-label">Prana</span><span class="dasha-value prana">{{ result.birth_pr }}</span></div>
+                </div>
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-subtle); text-align: center; color: rgba(255,255,255,0.4); font-size: 0.8rem;">MD Started: {{ result.md_start_date }}</div>
+            </div>
+            
+            {% if result.day_details %}
+            <div class="glass-card day-view-card">
+                <h3 class="section-title">Target Date: {{ result.target_date }}</h3>
+                <div class="dasha-note">ℹ️ These dasha systems display end dates and times</div>
+                <div class="day-summary">
+                    <div class="day-summary-item"><div class="day-summary-label">Mahadasha</div><div class="day-summary-value">{{ result.day_details.md_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.md_end }}</div></div>
+                    <div class="day-summary-item"><div class="day-summary-label">Antardasha</div><div class="day-summary-value">{{ result.day_details.ad_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.ad_end }}</div></div>
+                    <div class="day-summary-item"><div class="day-summary-label">Pratyantar</div><div class="day-summary-value">{{ result.day_details.pd_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.pd_end }}</div></div>
+                    <div class="day-summary-item"><div class="day-summary-label">Sookshma</div><div class="day-summary-value">{{ result.day_details.sd_lord }}</div><div class="day-summary-end">Ends {{ result.day_details.sd_end }}</div></div>
+                </div>
+                <div class="table-container" style="padding: 0; background: transparent; border: none;">
+                    <table class="data-table">
+                        <thead><tr><th>MD</th><th>AD</th><th>PD</th><th>SD</th><th>PR</th><th>End Date & Time</th></tr></thead>
+                        <tbody>
+                            {% for period in result.day_details.periods %}
+                            <tr>
+                                <td><strong>{{ period.md }}</strong></td>
+                                <td>{{ period.ad }}</td>
+                                <td>{{ period.pd }}</td>
+                                <td>{{ period.sd }}</td>
+                                <td style="color: var(--accent-purple); font-weight: bold;">{{ period.pr }}</td>
+                                <td style="font-family: 'Orbitron', monospace; color: var(--accent-cyan); font-size: 0.9rem;">{{ period.end_date }} {{ period.end_time }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="download-btn-container">
+                    <button type="button" class="btn-gold" onclick="openDownloadModal()"><span>📥</span> Download PDF Report</button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

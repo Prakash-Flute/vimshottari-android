@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Submit Article</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300;400;700&display=swap');
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Roboto',sans-serif;background:linear-gradient(135deg,#000428,#004e92);min-height:100vh;color:#fff;display:flex;justify-content:center;align-items:center}
+        .container{background:rgba(0,0,0,0.7);backdrop-filter:blur(15px);border-radius:20px;border:1px solid rgba(0,255,136,0.3);padding:40px;box-shadow:0 0 50px rgba(0,255,136,0.2);width:90%;max-width:600px}
+        h2{font-family:'Orbitron',monospace;font-size:2em;margin-bottom:30px;background:linear-gradient(45deg,#00ff88,#00ffff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+        select,input,button{width:100%;padding:15px;margin:10px 0;border-radius:10px;border:2px solid rgba(0,255,136,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:1em}
+        select:focus,input:focus{outline:none;border-color:#00ff88;box-shadow:0 0 15px rgba(0,255,136,0.5)}
+        button{background:linear-gradient(45deg,#00ff88,#00ffff);color:#000;font-weight:bold;cursor:pointer;transition:all .3s}
+        button:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,255,136,0.5)}
+        .dropdown-container{display:none}.advanced-button{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3)}
+    </style>
+    <script>function toggleDropdown(){const d=document.getElementById('dropdownContainer');d.style.display=d.style.display==='none'?'block':'none'}</script>
+</head>
+<body>
+    <div class="container">
+        <h2>Cosmic Article Submission Portal</h2>
+        <form action="/submit" method="POST">
+            <select name="ascendant" required><option value="-">Ascendant</option><option>Aries</option><option>Taurus</option><option>Gemini</option><option>Cancer</option><option>Leo</option><option>Virgo</option><option>Libra</option><option>Scorpio</option><option>Sagittarius</option><option>Capricorn</option><option>Aquarius</option><option>Pisces</option></select>
+            <select name="house" required><option value="-">House</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+            <select name="planet" required><option value="-">Planet</option><option>Sun</option><option>Moon</option><option>Mercury</option><option>Venus</option><option>Mars</option><option>Jupiter</option><option>Saturn</option><option>Rahu</option><option>Ketu</option></select>
+            <button type="button" class="advanced-button" onclick="toggleDropdown()">+ Advanced Options</button>
+            <div id="dropdownContainer" class="dropdown-container">
+                <select name="aspectedBy"><option value="-">Aspected By</option><option>Sun</option><option>Moon</option><option>Mercury</option><option>Venus</option><option>Mars</option><option>Jupiter</option><option>Saturn</option><option>Rahu</option><option>Ketu</option></select>
+                <select name="aspectedFromHouse"><option value="-">Aspected From House</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+                <select name="nakshatra"><option value="-">Nakshatra</option><option>Ashwini</option><option>Bharani</option><option>Krittika</option><option>Rohini</option><option>Mrigashira</option><option>Ardra</option><option>Punarvasu</option><option>Pushya</option><option>Ashlesha</option><option>Magha</option><option>Purva Phalguni</option><option>Uttara Phalguni</option><option>Hasta</option><option>Chitra</option><option>Swati</option><option>Vishakha</option><option>Anuradha</option><option>Jyeshtha</option><option>Mula</option><option>Purva Ashadha</option><option>Uttara Ashadha</option><option>Shravana</option><option>Dhanishta</option><option>Shatabhisha</option><option>Purva Bhadrapada</option><option>Uttara Bhadrapada</option><option>Revati</option></select>
+            </div>
+            <button type="submit">Submit to Cosmos</button>
+        </form>
+    </div>
+</body>
+</html>

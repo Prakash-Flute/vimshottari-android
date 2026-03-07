@@ -1,0 +1,45 @@
+{% extends "VIMSHOTTARI/base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cosmic-theme.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>🔮 COSMIC DASHA</h1>
+    <p>Vimshottari Planetary Timeline</p>
+</div>
+
+{% include "VIMSHOTTARI/includes/form_section.html" %}
+
+{% if error %}
+<div class="error-message glass-card fade-in">
+    <span>⚠️</span> {{ error }}
+</div>
+{% endif %}
+
+{% if result %}
+<div class="result fade-in" id="result-section">
+    
+    {% include "VIMSHOTTARI/includes/dasha_analysis.html" %}
+    {% include "VIMSHOTTARI/includes/natal_positions.html" %}
+    {% include "VIMSHOTTARI/includes/target_positions.html" %}
+    {% include "VIMSHOTTARI/includes/meteorology_chakras.html" %}
+    {% include "VIMSHOTTARI/includes/live_coordinates.html" %}
+    
+</div>
+{% endif %}
+
+{% include "VIMSHOTTARI/includes/download_modal.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/gps-location.js') }}"></script>
+<script src="{{ url_for('static', filename='js/live-tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chakra-renderer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ui-controller.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vimshottari-main.js') }}"></script>
+{% endblock %}
