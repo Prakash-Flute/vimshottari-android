@@ -31,7 +31,7 @@ android {
                 install "itsdangerous==2.1.2"
                 install "click==8.1.7"
                 install "blinker==1.7.0"
-                install "kerykeion==4.0.0"
+                install "immanuel==1.0.0"
                 install "fpdf==1.7.2"
             }
         }
