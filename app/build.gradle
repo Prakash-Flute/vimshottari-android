@@ -1,8 +1,11 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'                     id 'com.chaquo.python'
-}                                                     
-android {                                                 namespace 'com.vimshottari.app'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.chaquo.python'
+}
+
+android {
+    namespace 'com.vimshottari.app'
     compileSdk 34
 
     defaultConfig {
