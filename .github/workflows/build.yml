@@ -3,37 +3,51 @@ name: Build APK
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-        
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-          
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        
+
       - name: Accept Android Licenses
         run: yes | sdkmanager --licenses || true
-        
-      - name: Grant Gradle permission
-        run: chmod +x gradlew
-        
+
+      # 🔧 FIX: Create local.properties for CI environment
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+      # 🔧 FIX: Verify Gradle wrapper exists
+      - name: Verify Gradle Wrapper
+        run: |
+          if [ ! -f gradlew ]; then
+            echo "❌ gradlew not found! Run './gradle wrapper' locally and commit the files."
+            exit 1
+          fi
+          chmod +x gradlew
+
       - name: Clean Build
         run: ./gradlew clean
-        
+
+      # 🔧 FIX: Add more verbose output to see actual error
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
-        
+        run: ./gradlew assembleDebug --stacktrace --info
+        timeout-minutes: 15
+
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
@@ -41,3 +55,12 @@ jobs:
           name: vimshottari-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
+
+      # 🔧 FIX: Upload build logs on failure for debugging
+      - name: Upload Build Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: app/build/outputs/
+          retention-days: 1
