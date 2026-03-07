@@ -5,11 +5,13 @@ buildscript {
         kotlin_version = '1.9.20'
         chaquopy_version = '15.0.1'
     }
+
     repositories {
         google()
         mavenCentral()
         maven { url "https://chaquo.com/maven" }
     }
+
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -17,10 +19,6 @@ buildscript {
     }
 }
 
+// Do NOT define repositories here because settings.gradle controls them
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url "https://chaquo.com/maven" }
-    }
 }
